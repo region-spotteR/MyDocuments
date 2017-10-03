@@ -27,7 +27,7 @@ myshapes3<-lapply(1:nrow(tmp),function(j) {
                                     ifelse(j%%2==0,'rgb(191,190,196,0.5)','rbg(185,185,197,0.5)'),'white'))
   return(mylist)})
 
-## plotting it
+## plotting it; the order of the circle drawing does not really work
 ay <- list(title = "",zeroline = FALSE,showline = FALSE,showticklabels = FALSE, showgrid = FALSE)
 ax <- list(title = "",zeroline = FALSE,showline = FALSE,showticklabels = FALSE, showgrid = FALSE)
 gridly<-plot_ly() %>% 
