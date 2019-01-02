@@ -47,7 +47,7 @@ r=seq(0,1,1/n_grid) ## radius for all grid lines
 Calculating outer grid line of the radar/spider plot
 ----------------------------------------------------
 
-The first function I started to work on was based on the [idea of a Stackoverflow user](http://stackoverflow.com/questions/6862742/draw-a-circle-with-ggplot2). The idea here (as well as in all the following functions) is to draw a circle. A minimal radar plot consists of two circles: An inner circle where all the minimum data points lie and an outer circle where all the outer datapoints lie. The `ggradar`-package uses the `funcCircleCoords`-function to draw each of these circles.
+The first function I started to work on was based on the [idea of a Stackoverflow user](https://stackoverflow.com/questions/6862742/draw-a-circle-with-ggplot2/6863490#6863490). The idea here (as well as in all the following functions) is to draw a circle. A minimal radar plot consists of two circles: An inner circle where all the minimum data points lie and an outer circle where all the outer datapoints lie. The `ggradar`-package uses the `funcCircleCoords`-function to draw each of these circles.
 
 The function draws a polygon with multiple evenly spaced 'corners'. The `center`-argument gives where in the cartesian coordinate sytsem the center of the polygon lies. Then the `r`-argument indicates the radius, meaning what distance the polygon has from `center`. Now if we set the `npoints` argument to a very high number (for me anything over 100 does it), it looks as if we have circle. Even though in reality we have a polygon with more than 100 evenly spaced 'corners'.
 
