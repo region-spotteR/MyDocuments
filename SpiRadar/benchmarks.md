@@ -141,7 +141,7 @@ A radar/spider plot usually has straight lines from the center towards the end o
 Since all 'axis' need to have the same distance to each other you now that you will need as many 'axis' as categories. So where on the circumference are now the datapoints? Good old *π* will help you. The circumference of a circle is 2*π*, hence if we have a sequence of *n* steps starting at 0 and ending at 2*π*, we go full circle (because sin(0)=sin(2*π*) and cos(0)=cos(2*π*)). Therefore to reduce overplotting we need to stop shortly before 2*π*
 
 Thus our sequence needs to stop at some *t* &lt; 2*π*. The optimal *t* is such that all column names are plotted with even distance to each other. It turns out that we can calculate *t* using a constant *k* such that *t* = *k* \* 2 \* *π* &lt; 2 \* *π* (meaning ⇒*k* &lt; 1). Doing some trial and error I ended up with 
-![my equation](https://latex.codecogs.com/gif.download?k%3D%5Cfrac%7Bn-1%7D%7Bn%7D)
+![](https://latex.codecogs.com/gif.download?k%3D%5Cfrac%7Bn-1%7D%7Bn%7D)
 $k=\\frac{n-1}{n}$, where *n* is total count of all columns used for comparison.
 
 Does that guessed solution work? If *k* = 1 then sin(2 \* *π* \* 1)=sin(0) and we get overplotting. We need to divide by *n*, since that secures even spacing of the ploted column names and we need *n* − 1 in the nominator, because our first column name gets plotted at 0.
