@@ -87,9 +87,9 @@ microbenchmark::microbenchmark(myfun1(),myfun2(),times=1000L)
 ```
 
     ## Unit: microseconds
-    ##      expr     min      lq      mean   median       uq     max neval
-    ##  myfun1() 216.601 235.551 329.35431 262.6015 333.4015 13615.8  1000
-    ##  myfun2()  23.801  31.801  58.64269  40.2015  51.0010 12804.3  1000
+    ##      expr     min      lq      mean  median       uq     max neval
+    ##  myfun1() 219.202 238.101 335.90490 269.351 328.9015 19894.5  1000
+    ##  myfun2()  24.501  32.101  61.13581  40.301  50.6005 13484.4  1000
 
 My approach is a lot faster. This might be because the `ggradar`-function uses dataframes in the output, whereas I use matrices. In addition the `ggradar`-version is not fully adapted to my problem. With adapt I mean that for the application on a radar plot it doesn't matter where the center is. Therefore I removed the center option. For convenience and easier understanding I am setting the center at (0,0) in the cartesic coordinate system.
 
@@ -116,9 +116,9 @@ microbenchmark::microbenchmark(myfun1(),myfun2(),times=1000L)
 ```
 
     ## Unit: microseconds
-    ##      expr    min     lq     mean median      uq       max neval
-    ##  myfun1() 20.201 22.301 57.68452 23.100 25.6005 29254.801  1000
-    ##  myfun2() 23.901 26.201 36.35240 27.102 29.2015  2224.302  1000
+    ##      expr    min     lq     mean  median     uq       max neval
+    ##  myfun1() 20.602 22.501 53.16239 23.7000 37.401 19580.302  1000
+    ##  myfun2() 24.301 26.501 41.99702 27.7005 44.151  2265.401  1000
 
 ``` r
 microbenchmark::microbenchmark(myfun2(),myfun1(),times=1000L)
@@ -126,8 +126,8 @@ microbenchmark::microbenchmark(myfun2(),myfun1(),times=1000L)
 
     ## Unit: microseconds
     ##      expr    min     lq     mean median      uq     max neval
-    ##  myfun2() 23.301 24.451 28.49472 25.101 26.3010 163.901  1000
-    ##  myfun1() 19.501 20.901 24.20117 21.401 22.3015 185.301  1000
+    ##  myfun2() 23.901 25.201 29.08311 25.701 26.6010 206.801  1000
+    ##  myfun1() 19.901 21.501 24.40889 22.001 22.8005 260.401  1000
 
 Now the function is slightly faster than handwritten code. Therefore I would only use the function if I need to calculate this stuff more than once.
 
@@ -140,9 +140,9 @@ A radar/spider plot usually has straight lines from the center towards the end o
 
 Since all 'axis' need to have the same distance to each other you now that you will need as many 'axis' as categories. So where on the circumference are now the datapoints? Good old *π* will help you. The circumference of a circle is 2*π*, hence if we have a sequence of *n* steps starting at 0 and ending at 2*π*, we go full circle (because sin(0)=sin(2*π*) and cos(0)=cos(2*π*)). Therefore to reduce overplotting we need to stop shortly before 2*π*
 
-Thus our sequence needs to stop at some *t* &lt; 2*π*. The optimal *t* is such that all column name are plotted with even distance to each other. It turn out that we can calculate *t* using a constant *k* such that *t* = *k* \* 2 \* *π* &lt; 2 \* *π* (meaning ⇒*k* &lt; 1). This way we end up with *k* = 1, where *n* is total count of all columns used for comparison.
+Thus our sequence needs to stop at some *t* &lt; 2*π*. The optimal *t* is such that all column names are plotted with even distance to each other. It turns out that we can calculate *t* using a constant *k* such that *t* = *k* \* 2 \* *π* &lt; 2 \* *π* (meaning ⇒*k* &lt; 1). Doing some trial and error I ended up with $k=\\frac{n-1}{n}$, where *n* is total count of all columns used for comparison.
 
-Does that guessed solution work? If *k* = 1 then *s**i**n*(2 \* *p**i* \* 1)=*s**i**n*(0) and we get overplotting. We need to divide by *n*, since that secures even spacing of the ploted column names and we need *n* − 1 in the nominator, because our first column name gets plotted at 0.
+Does that guessed solution work? If *k* = 1 then sin(2 \* *π* \* 1)=sin(0) and we get overplotting. We need to divide by *n*, since that secures even spacing of the ploted column names and we need *n* − 1 in the nominator, because our first column name gets plotted at 0.
 
 With this spacing our datapoints will always stay on the same 'axis' in the circumference. But how do we set their 'height'? It turns out that we don't need to take care of that explicitly: To speak in the language of the `funcCircleCoords` each datapoint has a different radius value (because we rescale each datapoint between zero and one).
 
@@ -215,10 +215,10 @@ microbenchmark::microbenchmark(myfun1(),myfun2(),myfun3(),times=10000L)
 ```
 
     ## Unit: microseconds
-    ##      expr    min     lq     mean median      uq     max neval
-    ##  myfun1() 54.102 60.101 79.51614 62.601 72.8015 12800.8 10000
-    ##  myfun2() 43.300 47.501 67.02365 49.500 58.0010 34250.0 10000
-    ##  myfun3() 43.600 48.601 63.86021 50.702 59.7005 11558.6 10000
+    ##      expr    min     lq      mean median       uq     max neval
+    ##  myfun1() 55.001 61.701 104.67821 66.901 112.0005 21467.6 10000
+    ##  myfun2() 44.101 49.001  87.33522 53.901  92.2000 34993.7 10000
+    ##  myfun3() 44.501 50.001  84.16676 54.800  91.7010 17279.3 10000
 
 The slowest function is `CalculateAxisPath`, while `CalculateGroupPath6` and `funcCircleCoords` are on par. However both do the precisely same thing and since it doesn't really make sense to use three very similar functions for the same stuff, I will use `CalculateGroupPath6` as the only helper function in my new update. Mainly because it is the most flexible function of the three and doesn't need any ugly `lapply`-loop for speed like `funcCircleCoords`.
 
@@ -254,9 +254,9 @@ microbenchmark::microbenchmark(myfun1(),myfun2(),times=1000L)
 ```
 
     ## Unit: microseconds
-    ##      expr    min     lq    mean median     uq     max neval
-    ##  myfun1()  9.001 10.001 24.9318 10.901 11.801 12062.9  1000
-    ##  myfun2() 42.901 45.102 59.6393 46.200 50.001  3591.9  1000
+    ##      expr  min      lq     mean  median      uq       max neval
+    ##  myfun1()  9.3 11.6010 43.33926 20.6000  24.901 21701.602  1000
+    ##  myfun2() 44.3 48.9005 98.80819 86.7505 102.901  4324.801  1000
 
 ``` r
 microbenchmark::microbenchmark(myfun2(),myfun1(),times=1000L)
@@ -264,8 +264,8 @@ microbenchmark::microbenchmark(myfun2(),myfun1(),times=1000L)
 
     ## Unit: microseconds
     ##      expr    min     lq     mean median     uq     max neval
-    ##  myfun2() 42.901 45.001 53.14301 46.401 49.451 263.301  1000
-    ##  myfun1()  9.001 10.200 12.31110 11.001 11.900  97.501  1000
+    ##  myfun2() 44.500 47.402 63.93289 49.101 63.501 640.001  1000
+    ##  myfun1()  9.301 10.701 14.70930 11.601 13.851 308.401  1000
 
 Appendix
 ========
@@ -358,23 +358,99 @@ microbenchmark::microbenchmark(CalculateGroupPath(mymat),CalculateGroupPath2(mym
 ```
 
     ## Unit: microseconds
-    ##                        expr       min         lq       mean    median
-    ##   CalculateGroupPath(mymat) 30821.702 32466.1510 36328.5151 34191.501
-    ##  CalculateGroupPath2(mymat)   394.901   441.2505   569.3188   478.501
-    ##  CalculateGroupPath3(mymat)   361.801   404.9510   541.2227   442.051
-    ##  CalculateGroupPath4(mymat)   319.501   352.6010   466.2977   389.751
-    ##  CalculateGroupPath5(mymat)   304.900   333.6010   431.7994   367.200
-    ##  CalculateGroupPath6(mymat)    41.901    64.5010   106.5117    74.851
-    ##          uq       max neval
-    ##  36688.5505 70729.501  1000
-    ##    539.2010 15456.200  1000
-    ##    513.5010 16196.400  1000
-    ##    451.2010 13450.401  1000
-    ##    417.0000  9036.102  1000
-    ##     95.4505 18690.700  1000
+    ##                        expr       min         lq       mean     median
+    ##   CalculateGroupPath(mymat) 30821.002 34710.4500 41408.7643 37105.5505
+    ##  CalculateGroupPath2(mymat)   400.901   452.7505   693.5866   500.5510
+    ##  CalculateGroupPath3(mymat)   367.701   411.6015   584.6632   457.7010
+    ##  CalculateGroupPath4(mymat)   318.300   358.6510   511.0074   400.8010
+    ##  CalculateGroupPath5(mymat)   302.801   342.8005   512.3818   378.7005
+    ##  CalculateGroupPath6(mymat)    40.000    66.3005   113.8222    77.7010
+    ##          uq      max neval
+    ##  42525.3010 205823.2  1000
+    ##    676.6015  29986.0  1000
+    ##    582.7510  19523.4  1000
+    ##    523.3515  14482.0  1000
+    ##    506.2510  29552.9  1000
+    ##    100.9510  16956.0  1000
 
 Calculating the 'axis' lines
 ----------------------------
+
+``` r
+CalculateAxisPath <- function(var.names,min,max) {
+  #Caculates x-y coordinates for a set of radial axes (one per variable being plotted in radar plot)
+  #Args:
+  #var.names - list of variables to be plotted on radar plot
+  #min - MININUM value required for the plotted axes (same value will be applied to all axes)
+  #max - MAXIMUM value required for the plotted axes (same value will be applied to all axes)
+  #var.names <- c("v1","v2","v3","v4","v5")
+  n.vars <- length(var.names) # number of vars (axes) required
+  #Cacluate required number of angles (in radians)
+  angles <- seq(from=0, to=2*pi, by=(2*pi)/n.vars)
+  #calculate vectors of min and max x+y coords
+  min.x <- min*sin(angles)
+  min.y <- min*cos(angles)
+  max.x <- max*sin(angles)
+  max.y <- max*cos(angles)
+  #Combine into a set of uniquely numbered paths (one per variable)
+  axisData <- NULL
+  for (i in 1:n.vars) {
+    a <- c(i,min.x[i],min.y[i])
+    b <- c(i,max.x[i],max.y[i])
+    axisData <- rbind(axisData,a,b)
+  }
+  #Add column names + set row names = row no. to allow conversion into a data frame
+  colnames(axisData) <- c("axis.no","x","y")
+  rownames(axisData) <- seq(1:nrow(axisData))
+  #Return calculated axis paths
+  as.data.frame(axisData)
+}
+
+CalculateAxisPath2 <- function(var.names,min,max) {
+  n<-length(var.names)
+  #Cacluate required number of angles (in radians)
+  angles <- seq(from=0, to=2*pi, by=(2*pi)/n)
+  #calculate vectors of min and max x+y coords
+  min.x <- min*sin(angles)
+  min.y <- min*cos(angles)
+  max.x <- max*sin(angles)
+  max.y <- max*cos(angles)
+  tmp<-lapply(1:n,function(i) matrix(c(i,i,min.x[i],max.x[i],min.y[i],max.y[i]),2,3))
+  res<-as.data.frame(do.call(rbind,tmp))
+  colnames(res) <- c("axis.no","x","y")
+  return(res)
+}
+
+
+CalculateAxisPath3 <- function(var.names,min,max) {
+  n<-length(var.names)
+  #Cacluate required number of angles (in radians)
+  angles <- seq(from=0, to=2*pi, by=(2*pi)/n)
+  res<-data.frame(axis.no=rep(1:n,each=2), x=rep(c(min,max),n)*sin(rep(angles[-(n+1)],2)),
+                  y=rep(c(min,max),n)*cos(rep(angles[-(n+1)],2)))
+  return(res)
+}
+
+CalculateAxisPath4 <- function(var.names,min,max) {
+  n<-length(var.names)
+  angles <- seq(from=0, to=2*pi, by=(2*pi)/n)
+  #calculate vectors of min and max x+y coords
+  min.x <- min*sin(angles)
+  min.y <- min*cos(angles)
+  max.x <- max*sin(angles)
+  max.y <- max*cos(angles)
+  tmp<-lapply(1:n,function(i) matrix(c(i,i,min.x[i],max.x[i],min.y[i],max.y[i]),2,3))
+  res<-do.call(rbind,tmp)
+  return(res)
+}
+
+
+microbenchmark::microbenchmark(CalculateAxisPath(colnames(mat_radar),0+abs(center.offset),grid.max+abs(center.offset)),
+                               CalculateAxisPath2(colnames(mat_radar),0+abs(center.offset),grid.max+abs(center.offset)),
+                               CalculateAxisPath3(colnames(mat_radar),0+abs(center.offset),grid.max+abs(center.offset)),
+                               CalculateAxisPath4(colnames(mat_radar),0+abs(center.offset),grid.max+abs(center.offset)),
+                               times=1000L)
+```
 
     ## Unit: microseconds
     ##                                                                                                 expr
@@ -382,8 +458,8 @@ Calculating the 'axis' lines
     ##  CalculateAxisPath2(colnames(mat_radar), 0 + abs(center.offset),      grid.max + abs(center.offset))
     ##  CalculateAxisPath3(colnames(mat_radar), 0 + abs(center.offset),      grid.max + abs(center.offset))
     ##  CalculateAxisPath4(colnames(mat_radar), 0 + abs(center.offset),      grid.max + abs(center.offset))
-    ##      min       lq     mean  median       uq       max neval
-    ##   92.601 106.3005 162.5603 117.251 133.9010 22636.001  1000
-    ##   77.901  88.4010 133.4654  97.801 113.1505 21220.501  1000
-    ##  214.302 237.5510 303.4077 254.051 291.7005  8049.501  1000
-    ##   54.300  62.3515  98.6080  69.002  79.9010 21781.101  1000
+    ##      min       lq     mean  median       uq     max neval
+    ##   92.502 110.0510 168.3631 122.151 153.0010 17071.2  1000
+    ##   79.800  91.1510 139.7754 102.501 127.5510 12730.3  1000
+    ##  213.102 243.7510 357.4995 264.251 344.5005 11537.1  1000
+    ##   54.601  64.1505 112.8734  71.900  93.9005 14085.7  1000
