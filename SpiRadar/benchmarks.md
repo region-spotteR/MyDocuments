@@ -1,7 +1,9 @@
 SpiRadar: Benchmarks
 ================
-Moritz Baten
 August 19, 2018
+
+
+This document explains how I benchmarked my way from `ggradar` to `SpiRadar`. If you haven't read the function documentation please read this first. If you have done so and are in search of some specific information - skim-read and use cntrl+f. The only users who might be interested to read this whole document is users who want to build their own function and me in a few years, when I forgot completely what I did in the `SpiRadar`-package. ;)
 
 Overview
 --------
